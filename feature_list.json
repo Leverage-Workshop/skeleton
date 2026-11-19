@@ -1,0 +1,45 @@
+{
+  "features": [
+    {
+      "id": "feat-001",
+      "name": "Phase 0 foundation",
+      "description": "Next.js 16 / React 19 / TypeScript app with Tailwind, Base UI, Vitest, local TimescaleDB via Docker Compose, SQL migrations, AI SDK + Gateway wiring, and /api/health/db + /api/health/ai endpoints (docs/PRODUCT.md §8 Phase 0).",
+      "dependencies": [],
+      "status": "done",
+      "evidence": "PR #1 (0aedb13) and PR #2 (a95eef7) merged to main. Production /api/health/ai returned 200 on 2026-11-13."
+    },
+    {
+      "id": "feat-002",
+      "name": "Production DB health",
+      "description": "Set DATABASE_URL and DATABASE_CA_CERT in Vercel (Production + Preview), redeploy, and confirm https://alphascout.leverageworkshop.com/api/health/db returns 200. Last open item in docs/INFRASTRUCTURE.md 'Setup status'.",
+      "dependencies": ["feat-001"],
+      "status": "done",
+      "evidence": "2026-11-13: DATABASE_URL and DATABASE_CA_CERT set in Vercel for Production + Preview; after redeploy, GET https://alphascout.leverageworkshop.com/api/health/db -> 200 {\"ok\":true,\"postgresVersion\":\"18.6\",\"timescaleVersion\":\"2.30.2\"}."
+    },
+    {
+      "id": "feat-003",
+      "name": "Phase 1 product definition",
+      "description": "Product owner answers docs/PRODUCT.md §9 (query input, answer contents, instruments/granularity, similarity approach, single vs multi-user) and fills in functional requirements (§7). Afterwards, replace this entry with the concrete, approved MVP features.",
+      "dependencies": ["feat-001"],
+      "status": "blocked",
+      "blocked_on": "Product owner input. Do not add speculative research, ingestion or chat features before then.",
+      "evidence": ""
+    },
+    {
+      "id": "feat-004",
+      "name": "Landing page prompt box",
+      "description": "Product owner request (2026-11-15): replace the landing page copy with a textbox that sends the prompt to the configured Gateway model (AI_MODEL_ID) via POST /api/completion and renders the streamed response as Markdown (Streamdown).",
+      "dependencies": ["feat-001"],
+      "status": "done",
+      "evidence": "2026-11-15: ./init.sh passed (lint, typecheck, 20 tests incl. route + component tests, build). Local `next start` with AI_MODEL_ID=openai/gpt-6-luna streamed a Markdown reply from /api/completion. The AI_MODEL_ID in .env.local (openai/gpt-6.1-luna) is not in the Gateway catalog and yields a stream error."
+    },
+    {
+      "id": "feat-005",
+      "name": "NFL team report tool (experiment)",
+      "description": "Product owner request (2026-11-15, exploratory): a getTeamReport AI tool that takes a team name and returns the NFL team's record, standing, next game and recent news from ESPN's public API. The landing chat (useChat, POST /api/chat) shows the tool call and the model's Markdown reply. Not part of the trading product; remove when no longer wanted.",
+      "dependencies": ["feat-004"],
+      "status": "done",
+      "evidence": "2026-11-15: ./init.sh passed (35 tests incl. team matching, news filtering, chat request validation, route and UI tests). Live POST /api/chat on the local dev server: the model called getTeamReport({team:'Eagles'}) -> 2-7, 4th in NFC East, 5 news items, then streamed a Markdown summary with an ESPN link."
+    }
+  ]
+}
